@@ -33,24 +33,24 @@ ydy.df <- final.temp[ydy.idx, ]
 
 ### Min Temp Yesterday
 ```{r}
-gauge(round(min(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
-  success = c(65, 100), warning = c(0, 65),
+gauge(round(min(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+  success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
 ```
 
 ### Avg Temp Yesterday
 ```{r}
-gauge(round(mean(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
-  success = c(65, 100), warning = c(0, 65),
+gauge(round(mean(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+  success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
 ```
 
 ### Max Temp Yesterday
 ```{r}
-gauge(round(max(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
-  success = c(65, 100), warning = c(0, 65),
+gauge(round(max(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+  success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
 ```
@@ -65,12 +65,13 @@ Row
 temp.ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
 
 dygraph(temp.ts.obj) %>% 
-  dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp", color = "purple") %>% 
+  dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp", color = "purple") %>%
+  dyAxis("y", label = "Temperature (°F)") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
 
-Pressure {data-icon=""}
+Pressure {data-icon="ion-ios-timer-outline"}
 =======================================================================
 Column
 -----------------------------------------------------------------------
@@ -83,7 +84,7 @@ pres.ts.obj <- xts(final.pres[, 2, drop = FALSE], order.by = as.POSIXct(final.pr
 
 dygraph(pres.ts.obj) %>% 
   dySeries("pres", label = "Pressure", color = "orange") %>% 
-  dyAxis("y", label = "Millibars") %>% 
+  dyAxis("y", label = "Pressure (mb)") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
@@ -102,7 +103,7 @@ humd.ts.obj <- xts(final.humd[, 2, drop = FALSE], order.by = as.POSIXct(final.hu
 
 dygraph(humd.ts.obj) %>% 
   dySeries("humd", label = "Humidity", color = "blue") %>% 
-  dyAxis("y", label = "%") %>% 
+  dyAxis("y", label = "Humidity (%)") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
