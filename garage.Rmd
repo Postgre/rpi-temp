@@ -1,5 +1,5 @@
 ---
-title: "Merry Christmas"
+title: "Garage Temperature"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -26,7 +26,7 @@ final.temp$date <- paste(final.temp$date, ":00", sep = "")
 final.temp$temp.avg <- round(rowMeans(final.temp[,2:3]), 2)
 ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
 
-dygraph(ts.obj,  main = "Garage Temp") %>% 
+dygraph(ts.obj) %>% 
   dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()

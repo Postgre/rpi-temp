@@ -1,0 +1,15 @@
+# History files
+.Rhistory
+.Rapp.history
+
+# Session Data files
+.RData
+
+# OS Generated Files
+.DS_Store
+
+# Project description
+project.pdf
+
+# Ignore shell scripts
+*.sh
