@@ -1,0 +1,34 @@
+---
+title: "Merry Christmas"
+output: 
+  flexdashboard::flex_dashboard:
+    orientation: columns
+    vertical_layout: fill
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+library(dygraphs)
+library(xts)
+```
+
+Column
+-----------------------------------------------------------------------
+
+### Proof
+
+
+```{r}
+final.df <- read.csv("~/documents/programming/raspberrypi/garage/garage.txt", header = TRUE, stringsAsFactors = FALSE, 
+	colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
+final.temp <- final.df[,1:3]
+final.temp$date <- paste(final.temp$date, ":00", sep = "")
+final.temp$temp.avg <- round(rowMeans(final.temp[,2:3]), 2)
+ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
+
+dygraph(ts.obj,  main = "Garage Temp") %>% 
+  dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp") %>% 
+  dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
+  dyRangeSelector()
+```
+
