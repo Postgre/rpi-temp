@@ -15,7 +15,7 @@ final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", he
 final.df$date <- paste(final.df$date, ":00", sep = "")
 ```
 
-Temperature {data-orientation=rows}
+Temperature {data-orientation=rows data-icon="ion-thermometer"}
 =======================================================================
 
 Row
@@ -70,7 +70,7 @@ dygraph(temp.ts.obj) %>%
   dyRangeSelector()
 ```
 
-Pressure
+Pressure {data-icon=""}
 =======================================================================
 Column
 -----------------------------------------------------------------------
@@ -88,7 +88,7 @@ dygraph(pres.ts.obj) %>%
   dyRangeSelector()
 ```
 
-Humidity
+Humidity {data-icon="ion-waterdrop"}
 =======================================================================
 
 Column
