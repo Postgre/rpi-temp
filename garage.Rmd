@@ -1,5 +1,5 @@
 ---
-title: "Garage Temperature"
+title: "Garage Climate Stats"
 output: 
   flexdashboard::flex_dashboard:
     orientation: columns
@@ -10,24 +10,99 @@ output:
 library(flexdashboard)
 library(dygraphs)
 library(xts)
+final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, stringsAsFactors = FALSE, 
+	colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
+final.df$date <- paste(final.df$date, ":00", sep = "")
 ```
+
+Temperature {data-orientation=rows}
+=======================================================================
+
+Row
+-----------------------------------------------------------------------
+
+```{r}
+final.temp <- final.df[,1:3]
+final.temp$temp.avg <- round(rowMeans(final.temp[,2:3]), 2)
+
+tdy <- as.Date(final.temp[nrow(final.temp), 1])
+ydy <- tdy - 1
+ydy.idx <- grep(ydy, final.temp$date)
+ydy.df <- final.temp[ydy.idx, ]
+```
+
+### Min Temp Yesterday
+```{r}
+gauge(round(min(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
+  success = c(65, 100), warning = c(0, 65),
+  colors = c("#d6604d", "#4393c3")
+))
+```
+
+### Avg Temp Yesterday
+```{r}
+gauge(round(mean(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
+  success = c(65, 100), warning = c(0, 65),
+  colors = c("#d6604d", "#4393c3")
+))
+```
+
+### Max Temp Yesterday
+```{r}
+gauge(round(max(ydy.df$temp.avg)), min = 0, max = 100, symbol = '°', gaugeSectors(
+  success = c(65, 100), warning = c(0, 65),
+  colors = c("#d6604d", "#4393c3")
+))
+```
+
+Row
+-----------------------------------------------------------------------
+
+###  Temperature (15 min. intervals)
+
+
+```{r}
+temp.ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
+
+dygraph(temp.ts.obj) %>% 
+  dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp", color = "purple") %>% 
+  dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
+  dyRangeSelector()
+```
+
+Pressure
+=======================================================================
+Column
+-----------------------------------------------------------------------
+
+###  Pressure (15 min. intervals)
+
+```{r}
+final.pres <- final.df[,c(1,4)]
+pres.ts.obj <- xts(final.pres[, 2, drop = FALSE], order.by = as.POSIXct(final.pres$date, format = "%Y-%m-%d %H:%M:%S"))
+
+dygraph(pres.ts.obj) %>% 
+  dySeries("pres", label = "Pressure", color = "orange") %>% 
+  dyAxis("y", label = "Millibars") %>% 
+  dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
+  dyRangeSelector()
+```
+
+Humidity
+=======================================================================
 
 Column
 -----------------------------------------------------------------------
 
-### Proof
-
+### Humidity (15 min. intervals)
 
 ```{r}
-final.df <- read.csv("~/documents/programming/raspberrypi/garage/garage.txt", header = TRUE, stringsAsFactors = FALSE, 
-	colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
-final.temp <- final.df[,1:3]
-final.temp$date <- paste(final.temp$date, ":00", sep = "")
-final.temp$temp.avg <- round(rowMeans(final.temp[,2:3]), 2)
-ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
+final.humd <- final.df[, c(1,5)]
+humd.ts.obj <- xts(final.humd[, 2, drop = FALSE], order.by = as.POSIXct(final.humd$date, format = "%Y-%m-%d %H:%M:%S"))
 
-dygraph(ts.obj) %>% 
-  dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp") %>% 
+dygraph(humd.ts.obj) %>% 
+  dySeries("humd", label = "Humidity", color = "blue") %>% 
+  dyAxis("y", label = "%") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
