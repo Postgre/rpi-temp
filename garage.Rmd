@@ -10,8 +10,9 @@ output:
 library(flexdashboard)
 library(dygraphs)
 library(xts)
-final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, stringsAsFactors = FALSE, 
-	colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
+final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, 
+                     stringsAsFactors = FALSE, 
+                     colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
 final.df$date <- paste(final.df$date, ":00", sep = "")
 ```
 
@@ -58,7 +59,7 @@ gauge(round(max(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSecto
 Row
 -----------------------------------------------------------------------
 
-###  Temperature (15 min. intervals)
+###  Temperature (15 min. intervals) 
 
 
 ```{r}
@@ -66,10 +67,12 @@ temp.ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, form
 
 dygraph(temp.ts.obj) %>% 
   dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp", color = "purple") %>%
-  dyAxis("y", label = "Temperature (°F)") %>% 
+  dyAxis("y", label = "Temperature (F)") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
+
+> `r paste("Last update:", final.df$date[nrow(final.df)])`
 
 Pressure {data-icon="ion-ios-timer-outline"}
 =======================================================================
