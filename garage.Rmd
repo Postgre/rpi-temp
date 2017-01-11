@@ -12,7 +12,7 @@ library(dygraphs)
 library(xts)
 final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, 
                      stringsAsFactors = FALSE, 
-                     colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"))
+                     colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"), skipNul = TRUE)
 final.df$date <- paste(final.df$date, ":00", sep = "")
 ```
 
