@@ -10,10 +10,15 @@ output:
 library(flexdashboard)
 library(dygraphs)
 library(xts)
-final.df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, 
+df <- read.csv("~/Documents/Programming/RaspberryPi/garage/garage.txt", header = TRUE, 
                      stringsAsFactors = FALSE, 
                      colClasses =  c("character", "numeric", "numeric", "numeric", "numeric"), skipNul = TRUE)
-final.df$date <- paste(final.df$date, ":00", sep = "")
+df <- df[-c(1:11, 2052:2069), ]
+rownames(df) <- 1:nrow(df)
+df$date <- paste(df$date, ":00", sep = "")
+#df$diff <- c(0,diff(as.POSIXct(df$date)))
+#df.blackout <- df[sort(c(as.integer(rownames(df[df$diff > 15, ])), as.integer(rownames(df[df$diff > 15, ])) - 1)), ]
+#df.blackout$date <- as.POSIXct(df.blackout$date)
 ```
 
 Temperature {data-orientation=rows data-icon="ion-thermometer"}
@@ -23,34 +28,34 @@ Row
 -----------------------------------------------------------------------
 
 ```{r}
-final.temp <- final.df[,1:3]
-final.temp$temp.avg <- round(rowMeans(final.temp[,2:3]), 2)
+temp <- df[,1:3]
+temp$temp.avg <- round(rowMeans(temp[,2:3]), 2)
 
-tdy <- as.Date(final.temp[nrow(final.temp), 1])
-ydy <- tdy - 1
-ydy.idx <- grep(ydy, final.temp$date)
-ydy.df <- final.temp[ydy.idx, ]
+# tdy <- as.Date(final.temp[nrow(final.temp), 1])
+# ydy <- tdy - 1
+# ydy.idx <- grep(ydy, final.temp$date)
+# ydy.df <- final.temp[ydy.idx, ]
 ```
 
-### Min Temp Yesterday
+### Min Temp
 ```{r}
-gauge(round(min(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+gauge(round(min(temp$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
   success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
 ```
 
-### Avg Temp Yesterday
+### Avg Temp
 ```{r}
-gauge(round(mean(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+gauge(round(mean(temp$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
   success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
 ```
 
-### Max Temp Yesterday
+### Max Temp
 ```{r}
-gauge(round(max(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
+gauge(round(max(temp$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSectors(
   success = c(65, 80), warning = c(40, 65),
   colors = c("#d6604d", "#4393c3")
 ))
@@ -59,31 +64,32 @@ gauge(round(max(ydy.df$temp.avg)), min = 40, max = 80, symbol = '°', gaugeSecto
 Row
 -----------------------------------------------------------------------
 
-###  Temperature (15 min. intervals) 
+###  Temperature (15 min. intervals, 12/22/16 - 01/12/17) 
 
 
 ```{r}
-temp.ts.obj <- xts(final.temp[,2:4], order.by = as.POSIXct(final.temp$date, format = "%Y-%m-%d %H:%M:%S"))
+temp.ts.obj <- xts(temp[,2:4], order.by = as.POSIXct(temp$date, format = "%Y-%m-%d %H:%M:%S"))
 
 dygraph(temp.ts.obj) %>% 
   dySeries(c("temp.pres", "temp.avg", "temp"), label = "Avg. Temp", color = "purple") %>%
   dyAxis("y", label = "Temperature (F)") %>% 
+  #dyShading(from = "2017-01-12", to = "2017-01-12", color = "#A8A8A8") %>% 
   dyLegend(show = "always", hideOnMouseOut = TRUE, width = 400) %>% 
   dyRangeSelector()
 ```
 
-> `r paste("Last update:", final.df$date[nrow(final.df)])`
+> `r paste("Last update:", df$date[nrow(df)])`
 
 Pressure {data-icon="ion-ios-timer-outline"}
 =======================================================================
 Column
 -----------------------------------------------------------------------
 
-###  Pressure (15 min. intervals)
+###  Pressure (15 min. intervals, 12/22/16 - 01/12/17)
 
 ```{r}
-final.pres <- final.df[,c(1,4)]
-pres.ts.obj <- xts(final.pres[, 2, drop = FALSE], order.by = as.POSIXct(final.pres$date, format = "%Y-%m-%d %H:%M:%S"))
+pres <- df[,c(1,4)]
+pres.ts.obj <- xts(pres[, 2, drop = FALSE], order.by = as.POSIXct(pres$date, format = "%Y-%m-%d %H:%M:%S"))
 
 dygraph(pres.ts.obj) %>% 
   dySeries("pres", label = "Pressure", color = "orange") %>% 
@@ -98,11 +104,11 @@ Humidity {data-icon="ion-waterdrop"}
 Column
 -----------------------------------------------------------------------
 
-### Humidity (15 min. intervals)
+### Humidity (15 min. intervals, 12/22/16 - 01/12/17)
 
 ```{r}
-final.humd <- final.df[, c(1,5)]
-humd.ts.obj <- xts(final.humd[, 2, drop = FALSE], order.by = as.POSIXct(final.humd$date, format = "%Y-%m-%d %H:%M:%S"))
+humd <- df[, c(1,5)]
+humd.ts.obj <- xts(humd[, 2, drop = FALSE], order.by = as.POSIXct(humd$date, format = "%Y-%m-%d %H:%M:%S"))
 
 dygraph(humd.ts.obj) %>% 
   dySeries("humd", label = "Humidity", color = "blue") %>% 
